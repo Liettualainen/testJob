@@ -1,75 +1,30 @@
-import { React, Component } from "react";
-import { getUsers, recordsPerPage } from "MockapiAPI";
-import UserCard from "./UserCard";
+import { lazy } from "react";
+import { Route, Routes } from 'react-router-dom';
 
-export class App extends Component {
-  constructor() {
-    console.log('constructor');
-    super();
-    this.state = {
-      page: 1,
-      users: []
-    };
-  }
 
-  componentDidMount() {
-    console.log('componentDidMount');
-    this.#loadUsers().then(() => {});
-  }
 
-  render() {
-    console.log('render');
-    return (
-        <div
-          style={{
-            height: '100vh',
-            display: 'flex',
-            flexDirection:'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontSize: 40,
-            color: '#010101'
-          }}
-        >
-          React homework template test-job
-        
-        {
-            this.state.users.map(({ id, tweets, avatar, followers }) => {
-              return (
-                <UserCard
-                  id={id}
-                  tweets={tweets}
-                  followers={followers}
-                  avatar={avatar}
-                  following = "{this.#isFollowing(id)}"
-                />
-              );
-            })
-          }
+import { Layout } from "./Layout";
+import { Navigation } from "./Navigation";
+import {
+    AppLayout} from './Styled/AppLayout.styled'
 
-          <button>LOAD MORE</button>
-        </div>
-      );
-  }
-  
-  async #loadUsers() {
-    try {
-      const users = await (await getUsers(this.state.page)).json();
-      this.setState({ page: this.state.page + 1, users: users });
-      if (users.length < recordsPerPage) {
-        // TODO: disable 'load more' button
-      }
-    }
-    catch (error) {
-      console.log(error);
-    }
-  }
+const HomePage = lazy(() => import('./Pages/Home'));
+const Catalogue = lazy(() => import('./Pages/Catalogue'));
+const Favorites = lazy(() => import('./Pages/Favorites'));
+const NotFound = lazy(() => import('./Pages/Notfound'));
 
-  #isFollowing(id) {
-    //TODO
-    return false;
-  }
-  
+export const App = () => {
+  return (
+    <AppLayout>
+      <Navigation />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route path="/catalogue" element={<Catalogue />} />
+        <Route path="/favorites" element={<Favorites />} />          
+        <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </AppLayout>
+  )
 };
-
-
